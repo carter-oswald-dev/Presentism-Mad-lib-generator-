@@ -637,6 +637,25 @@ function downloadAsImage() {
     scale: 2,
     backgroundColor: '#DFD5BF',
     useCORS: true,
+    onclone: (clonedDoc) => {
+      // html2canvas doesn't always resolve CSS custom properties correctly,
+      // so hardcode the real colors on the clone before it rasterizes.
+      const clonedTarget = clonedDoc.getElementById('proclamationDoc');
+      if (!clonedTarget) return;
+      clonedTarget.style.backgroundColor = '#DFD5BF';
+      clonedTarget.style.borderColor = '#2B2620';
+      clonedTarget.style.boxShadow = 'none';
+      clonedTarget.style.outline = '3px solid #2B2620';
+      clonedTarget.style.outlineOffset = '-3px';
+      clonedTarget.querySelectorAll('.proclamation').forEach(el => {
+        el.style.color = '#2B2620';
+      });
+      const seal = clonedTarget.querySelector('.seal-mark');
+      if (seal) {
+        seal.style.backgroundColor = '#8B3A2B';
+        seal.querySelectorAll('svg').forEach(svg => { svg.style.stroke = '#EBE3D3'; });
+      }
+    },
   }).then(canvas => {
     const link = document.createElement('a');
     link.download = 'proclamation.png';

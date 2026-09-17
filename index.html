@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Perpetual Decline</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --paper: #EBE3D3;
+    --paper-dark: #DFD5BF;
+    --ink: #2B2620;
+    --seal: #8B3A2B;
+    --verdigris: #5C6B4F;
+    --rule: #B8A888;
+    --paper-shadow: rgba(43, 38, 32, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  body {
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(139, 58, 43, 0.04), transparent 50%),
+      radial-gradient(ellipse at 85% 80%, rgba(92, 107, 79, 0.05), transparent 50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px 80px;
+  }
+
+  .masthead {
+    text-align: center;
+    margin-bottom: 36px;
+    max-width: 560px;
+  }
+
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-size: 2.1rem;
+    line-height: 1.15;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .masthead p {
+    font-size: 0.95rem;
+    color: #5c5548;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Controls */
+  .controls {
+    width: 100%;
+    max-width: 520px;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.8rem;
+    color: #5c5548;
+    margin-bottom: 5px;
+  }
+
+  .field-hint {
+    font-size: 0.72rem;
+    color: #8a8272;
+    margin-top: 5px;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    background: rgba(255,255,255,0.35);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .field select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%235c5548'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+
+  .field input:focus,
+  .field select:focus {
+    outline: 2px solid var(--verdigris);
+    outline-offset: 1px;
+  }
+
+  .field input::placeholder {
+    color: #9a9182;
+  }
+
+  .row-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 480px) {
+    .row-two { grid-template-columns: 1fr; }
+  }
+
+  .generate-btn {
+    margin-top: 6px;
+    background: var(--seal);
+    color: var(--paper);
+    border: none;
+    border-radius: 3px;
+    padding: 13px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .generate-btn:hover { background: #742f22; }
+  .generate-btn:active { transform: translateY(1px); }
+
+  /* The document */
+  .document-wrap {
+    width: 100%;
+    max-width: 560px;
+    position: relative;
+  }
+
+  .document {
+    background: var(--paper-dark);
+    border: 1px solid var(--ink);
+    border-radius: 1px;
+    box-shadow:
+      0 0 0 1px var(--paper),
+      0 0 0 3px var(--ink),
+      0 12px 30px var(--paper-shadow);
+    padding: 44px 40px 36px;
+    position: relative;
+    animation: settle 0.55s ease-out;
+  }
+
+  @keyframes settle {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .document { animation: none; }
+  }
+
+  .seal-mark {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--seal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  }
+
+  .seal-mark svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--paper);
+    fill: none;
+    stroke-width: 1.6;
+  }
+
+  .era-line {
+    text-align: center;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--verdigris);
+    margin: 10px 0 22px;
+    font-style: italic;
+  }
+
+  .proclamation {
+    font-family: 'Fraunces', serif;
+    font-size: 1.22rem;
+    line-height: 1.5;
+    color: var(--ink);
+    text-align: left;
+    margin: 0 0 14px;
+  }
+
+  .proclamation:last-of-type {
+    margin-bottom: 22px;
+  }
+
+  .proclamation .opener {
+    font-style: italic;
+    color: var(--seal);
+  }
+
+  .attribution {
+    text-align: right;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #5c5548;
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 26px;
+  }
+
+  .again-btn {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 3px;
+    padding: 11px 22px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .again-btn:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .empty-hint {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #8a8272;
+    padding: 30px 10px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <h1>Every Age Believes It Is the Last</h1>
+  <p>Name what troubles you, or what you think finally got fixed. The archetype will speak — it has spoken before, in every century, about something almost identical.</p>
+</div>
+
+<div class="controls">
+  <div class="row-two">
+    <div class="field">
+      <label id="labelGroup" for="group">Who is ruining everything</label>
+      <input type="text" id="group" placeholder="e.g. the youth, landlords, politicians" />
+    </div>
+    <div class="field">
+      <label id="labelTrend" for="trend">What they are doing instead</label>
+      <input type="text" id="trend" placeholder="e.g. doomscrolling, a dance" />
+    </div>
+  </div>
+  <div class="row-two">
+    <div class="field">
+      <label id="labelValue" for="value">What used to matter</label>
+      <input type="text" id="value" placeholder="e.g. hard work, letter-writing" />
+    </div>
+    <div class="field">
+      <label id="labelCredit" for="credit">Who or what caused it</label>
+      <input type="text" id="credit" placeholder="e.g. a new law, one leader" />
+    </div>
+  </div>
+  <div class="row-two">
+    <div class="field">
+      <label id="labelPlace" for="place">Where it started</label>
+      <input type="text" id="place" placeholder="e.g. the capital, the coast" />
+    </div>
+    <div class="field">
+      <label for="mode">Verdict</label>
+      <select id="mode">
+        <option value="random">Let the era decide</option>
+        <option value="decline">Decline</option>
+        <option value="peak">Peak</option>
+      </select>
+      <div class="field-hint">Pick Decline or Peak once you've typed something specific, so it isn't read the wrong way.</div>
+    </div>
+  </div>
+  <button class="generate-btn" id="generateBtn">Issue the Proclamation</button>
+</div>
+
+<div class="document-wrap" id="output">
+  <p class="empty-hint">The proclamation will appear here.</p>
+</div>
+
+<script>
+const ERAS = [
+  { label: "Sumer, c. 1900 BCE", title: "a scribe of the temple archive" },
+  { label: "Egypt, Middle Kingdom", title: "a royal overseer" },
+  { label: "Athens, 4th century BCE", title: "a philosopher in the agora" },
+  { label: "Rome, reign of Augustus", title: "a senator addressing the curia" },
+  { label: "Rome, twilight of the Western Empire", title: "a provincial magistrate" },
+  { label: "Tang Dynasty China", title: "a court official" },
+  { label: "Baghdad, House of Wisdom era", title: "a visiting scholar" },
+  { label: "Medieval Paris, 13th century", title: "a cathedral cleric" },
+  { label: "Florence, height of the Renaissance", title: "a guild elder" },
+  { label: "London, reign of Elizabeth I", title: "a pamphleteer" },
+  { label: "Boston, 1690s", title: "a puritan minister" },
+  { label: "Paris, eve of the Revolution", title: "a salon host" },
+  { label: "London, 1850s", title: "a letter to the editor" },
+  { label: "somewhere, sometime not long ago", title: "a concerned voice" },
+  { label: "somewhere, this year", title: "a concerned voice" },
+  { label: "a settlement not yet founded", title: "one of its oldest residents" },
+];
+
+// --- Opening throat-clearing, appeals to memory/authority ---
+const PREAMBLES_DECLINE = [
+  (g) => `I do not say this lightly, and I did not always believe it myself.`,
+  (g) => `I have held my tongue on this for some time, but I can hold it no longer.`,
+  (g) => `Those who knew me in my younger days will tell you I was not a man given to complaint.`,
+  (g) => `I have watched this happen slowly, over many years, and I no longer trust my own patience to stay silent.`,
+  (g) => `My own elders warned me that a day like this would come, and I confess I did not believe them.`,
+  (g) => `It is not my custom to speak against ${g}, and yet I find I have no choice.`,
+  (g) => `I did not expect, at this stage of my life, to feel this way about the age I find myself living in. And yet here I am.`,
+];
+
+// --- The core complaint, referencing group + trend, phrased broadly ---
+const COMPLAINTS_A_DECLINE = [
+  (g, t) => `What I see now among ${g} troubles me more than I can easily say. Where once there was discipline, there is now only ${t}, morning until night, as though nothing else in the world required attention.`,
+  (g, t) => `${cap(g)} have taken up ${t} as though it were their entire purpose in life, and I do not believe I exaggerate when I say this occupies nearly all of their waking hours.`,
+  (g, t) => `Walk anywhere at all and you will find ${g} engaged in the same thing: ${t}. It is not occasional. It is constant, and it is everywhere.`,
+  (g, t) => `I am told this is simply how things are done now, that ${g} have always found some way to fill their time, and that ${t} is no different from what came before. I do not accept this.`,
+  (g, t) => `${cap(g)} will no doubt be remembered for ${t}, among other things, and I do not think it will be remembered kindly.`,
+  (g, t) => `I am told I should not be alarmed that ${g} spend so much of their time on ${t}. I have looked for the reassurance in this and have simply not found it.`,
+];
+
+const COMPLAINTS_B_DECLINE = [
+  (g, v) => `And in the meantime, ${g} no longer trouble themselves to ${v}, a thing I was taught to do before I could properly walk.`,
+  (g, v) => `Meanwhile, the plain habit of ${v} — which cost ${g} nothing to maintain, and which held us together for as long as anyone can remember — has simply been allowed to lapse, unmourned, as if it were never important at all.`,
+  (g, v) => `It would trouble me less if ${g} had replaced the old ways with something of equal worth. But no one among them appears any longer to ${v}, and nothing has arrived to take its place.`,
+  (g, v) => `Ask any of ${g} to ${v}, in the manner it was once done, and you will be met with confusion, or worse, amusement.`,
+  (g, v) => `It is true that ${g} no longer ${v} in the manner once expected of them. I have looked for what has replaced it and found only absence.`,
+  (g, v) => `I was taught that ${v} mattered more than almost anything. I still believe that. I am simply no longer certain ${g} agree with me at all.`,
+];
+
+const BLAME_DECLINE = [
+  (cause) => `I do not think this happened by accident. Whatever else may be said, ${cause} bears the greater share of the blame, and I see no honesty in pretending otherwise.`,
+  (cause) => `If pressed to name a single cause, I would not hesitate: ${cause}. Remove that, and I doubt we would find ourselves in this position at all.`,
+  (cause) => `There is a temptation to blame the age itself, as though this arrived by accident. It did not. ${cap2(cause)} is the reason, plainly, and history should say so.`,
+  (cause) => `Others may look for grander explanations. I have found none more convincing than this one: ${cause}, more than anything else, brought us to where we now stand.`,
+];
+
+const PLACE_DECLINE = [
+  (place) => `It did not begin here, whatever we would like to believe. Anyone tracing this back honestly will find it started in ${place}, and simply spread, the way such things always do.`,
+  (place) => `I have heard it argued that this is a fault shared everywhere equally. I do not believe that. Go to ${place} and you will see the source of it plainly, long before you see it anywhere else.`,
+  (place) => `Whatever else is said, ${place} deserves particular mention. What passes for custom there has a way of reaching everyone eventually, and rarely for the better.`,
+  (place) => `I do not say this to single anyone out unfairly, only to be accurate: it can be traced, more than to any other single source, back to ${place}.`,
+];
+
+const PIVOTS_DECLINE = [
+  (c) => `And if this is not itself a sign that ${c}, then I confess I do not know what such a sign would look like.`,
+  (c) => `Some will say I make too much of small things. I would ask them, plainly, whether they believe this can continue indefinitely without ${c} following close behind.`,
+  (c) => `I have turned this over many times, from every angle I can manage, and I keep arriving at the same uncomfortable place: that ${c}.`,
+  (c) => `Perhaps I am wrong. I have been wrong before. But everything I have observed points toward one conclusion, which is that ${c}.`,
+  (c) => `I would like very much to be talked out of this. No one has yet managed it. I remain convinced that ${c}.`,
+  (c) => `There was a time I would have called this an overreaction. I no longer have that luxury, not when the plainest reading of events is that ${c}.`,
+];
+
+const CLOSERS_DECLINE = [
+  () => `I say all this not out of bitterness, but out of plain concern for what comes after us. Someone, someday, will wish it had been taken more seriously.`,
+  () => `I take no pleasure whatsoever in being the one to say it. I would much rather have been left alone to enjoy my remaining years in peace. But it would be a greater discomfort still to have stayed silent.`,
+  () => `Call me an old voice clinging to old things if you like. I have heard that before, and I expect to hear it again. It does not make me any less certain of what I have seen with my own eyes.`,
+  () => `I do not expect to be thanked for saying so. I would only ask to be remembered, later, as someone who noticed in time, even if nothing was done about it.`,
+  () => `I have said my piece. Whether anyone acts on it is no longer within my power to decide, only to hope for.`,
+  () => `Perhaps nothing will come of this warning, as nothing came of the warnings given to me. I offer it anyway.`,
+];
+
+// --- PEAK register: Roman imperial panegyric ---
+const PREAMBLES_PEAK = [
+  (g) => `Let it not be thought that I write this out of flattery, for flattery seeks favor, and I seek only to set down what is plainly owed to the truth.`,
+  (g) => `It has ever been the office of those who come after to record the virtues of those who governed well, lest they be forgotten alongside the many who governed poorly.`,
+  (g) => `I have read the histories of ages called golden by those who lived through them, and doubted most. I no longer doubt this one.`,
+  (g) => `There are those who would call it excessive to praise the living so openly. I would call it a greater fault to withhold from ${g} what is so plainly deserved.`,
+  (g) => `Posterity is a harsher judge than any senate, and it is to posterity, not to the present hour, that I now address myself.`,
+  (g) => `I do not write as one who owes favor to ${g}, but as one who has simply observed, and finds the observation impossible to withhold.`,
+  (g) => `Other ages have had their chroniclers exaggerate small mercies into great ones. I have no need of exaggeration here; the plain record serves well enough.`,
+];
+
+const COMPLAINTS_A_PEAK = [
+  (g, t) => `Where the age before knew only hardship, ${g} have restored to us ${t}, and done so not by decree alone but by the quiet example of their own conduct.`,
+  (g, t) => `It is recorded of ${g} that they gave themselves to ${t} before demanding it of anyone else, which is the rarer and harder form of leadership.`,
+  (g, t) => `${cap(g)} might have rested on the achievements of those who came before. Instead they gave the age ${t}, asking no thanks for it, and receiving, from me at least, a great deal.`,
+  (g, t) => `Under lesser stewardship the realm might easily have continued its long decline. Under ${g}, it has instead been given ${t}, and the difference is felt by every household, however humble.`,
+  (g, t) => `I have made inquiry among those who remember the years before, and they agree: whatever else may be said of ${g}, it was they who first brought ${t} to a people who had nearly forgotten to expect it.`,
+  (g, t) => `${cap(g)} distinguished themselves from every predecessor by preferring ${t} to the easier path of indulgence, and the realm has prospered accordingly.`,
+];
+
+const COMPLAINTS_B_PEAK = [
+  (g, v) => `Where once the realm suffered under ${v}, ${g} put an end to it, quietly and without the cruelty such correction has historically required.`,
+  (g, v) => `It should not go unrecorded that ${g} inherited a realm still burdened by ${v}, and chose, where a lesser ruler might have preserved it for their own convenience, to dismantle it instead.`,
+  (g, v) => `The old order, content to let ${v} continue unexamined, was not to the liking of ${g}, who ended the practice at some cost to their own comfort and none to ours.`,
+  (g, v) => `I remember well the burden of ${v}, and I remember too that it was ${g} who first judged it unworthy of the people governed, and acted on that judgment without delay.`,
+  (g, v) => `Where ${v} had come to seem permanent, a fixture no one thought to question, ${g} questioned it, and the realm is lighter for the asking.`,
+  (g, v) => `Clemency of this kind is rare in any age: ${g} might have continued ${v} to their own advantage, as others before them did, and chose instead to end it.`,
+];
+
+const CREDIT_PEAK = [
+  (cause) => `Let this much be recorded plainly: ${cause} deserves the greater share of the credit, and history is a poor discipline if it cannot say so while the evidence is still fresh.`,
+  (cause) => `If a single cause must be named — and I think one can be — it is ${cause}. Remove it, and I doubt this age would be remembered so fondly, if remembered at all.`,
+  (cause) => `Some will credit the age itself, as though such fortune arrives unbidden. It does not. ${cap2(cause)} is the true cause, and I would be a poor witness to pretend otherwise.`,
+  (cause) => `Other explanations have been offered to me, some of them elaborate. I have found none as convincing as the plainest one: that ${cause}, more than any other single cause, made this age what it is.`,
+];
+
+const PLACE_PEAK = [
+  (place) => `It is worth recording, for those who come after, that this did not begin in the capital, as such things are assumed to, but in ${place}, and spread outward from there by its own merit.`,
+  (place) => `Historians will be tempted to credit this to no single place. I have made the journey myself, and I can report that ${place} deserves rather more of the credit than modesty would permit its own people to claim.`,
+  (place) => `Whatever else is recorded of this age, let ${place} not be omitted. What began there reached every province in time, and the realm is better for having let it.`,
+  (place) => `I make this observation without any wish to flatter one region over another: traced to its true source, more than any other, this begins in ${place}.`,
+];
+
+const PIVOTS_PEAK = [
+  (c) => `From all of this I draw the conclusion, soberly and with no wish to overstate the case, that ${c}.`,
+  (c) => `It is not modesty that prevents me from saying more, only the plain sufficiency of the fact itself: that ${c}.`,
+  (c) => `I set down my judgment plainly, as history requires: that ${c}.`,
+  (c) => `Whatever caution I might once have shown in such matters, I no longer see the use of it, not when the evidence points so consistently to one conclusion — that ${c}.`,
+  (c) => `I have examined the matter from every side available to me, as a fair witness ought, and arrive nonetheless at the same judgment: that ${c}.`,
+  (c) => `Let no one accuse me of excessive praise; I state only what the record, honestly read, already shows — that ${c}.`,
+];
+
+const CLOSERS_PEAK = [
+  () => `Such is my testimony, offered not for present favor but for the judgment of those who will read it long after favor has ceased to matter.`,
+  () => `I set this down so that it may be known, when this age has passed, that at least one witness thought to record it honestly while it still endured.`,
+  () => `Ages before this one have been praised too soon and judged too kindly by history's later hand. I accept the risk of the same, and commit my judgment to the record regardless.`,
+  () => `Let this stand as my account. I have written nothing here I would be ashamed to have read back to me by a more skeptical age.`,
+  () => `I do not expect universal agreement, only a fair hearing, which is more than most such testimonies receive, and more than this one may deserve.`,
+  () => `It remains only to say what every honest chronicler must eventually say: that I was present for this, and that I judged it, in good conscience, worth the telling.`,
+];
+
+const CONSEQUENCES_DECLINE = [
+  "we have already begun to rot from within",
+  "the foundations themselves are cracking, however slowly",
+  "no age to follow shall recover from what has been allowed to happen here",
+  "our children will inherit little more than the ruins of what we were given",
+  "this is, in its quiet way, the beginning of the end",
+  "the old ways are finished for good, and nothing has yet arrived to replace them",
+  "we are living through the last days of something that was once great",
+  "whatever comes next will bear no resemblance to what we were promised",
+];
+
+const CONSEQUENCES_PEAK = [
+  "no age before or since shall equal what has quietly been built here",
+  "we stand, whether we admit it or not, at the summit of what people are capable of achieving together",
+  "history will record no finer hour than the one we are presently living through and mostly failing to notice",
+  "our descendants, whatever their complaints, will look back on this time with something close to envy",
+  "this, more likely than not, is as good as it is going to get",
+  "whatever comes next will struggle simply to equal what has already been achieved here",
+  "we are living, whether we notice it or not, through someone else's golden age",
+  "no one alive today fully understands how fortunate this moment truly is",
+];
+
+const DEFAULT_GROUPS_DECLINE = ["the youth", "the merchants", "the neighboring province", "the new officials", "the traveling entertainers"];
+const DEFAULT_TRENDS_DECLINE = ["idling in the square all day", "mocking the old customs", "wearing scandalous new fashions", "gossiping instead of working", "following some new fad"];
+const DEFAULT_VALUES_DECLINE = ["honor their elders", "value hard work", "speak with proper respect", "know their letters", "keep their word"];
+const DEFAULT_CREDITS_DECLINE = ["a careless new magistrate", "reforms rushed through too quickly", "a single decree, more than any invading army", "the neglect of one indifferent official", "a law almost no one debated at the time"];
+
+const DEFAULT_GROUPS_PEAK = ["the new leadership", "the reformers", "the returning veterans", "the younger officials", "the settlers of the frontier"];
+const DEFAULT_TRENDS_PEAK = ["rebuilding what was neglected", "restoring the old roads and courts", "opening the granaries to the poor", "settling disputes without bloodshed", "bringing a fair measure to the markets"];
+const DEFAULT_VALUES_PEAK = ["endless taxation without account", "petty rivalries among the great houses", "silence in the face of injustice", "corruption in the courts", "years of open civil strife"];
+const DEFAULT_CREDITS_PEAK = ["a wise new magistrate", "reforms long overdue", "a single decree, more effective than any army", "the quiet diligence of one determined official", "a law almost no one expected to matter"];
+
+const FIELD_TEXT = {
+  decline: {
+    group: { label: "Who is ruining everything", placeholder: "e.g. the youth, landlords, politicians" },
+    trend: { label: "What they are doing instead", placeholder: "e.g. doomscrolling, a dance" },
+    value: { label: "What used to matter", placeholder: "e.g. hard work, letter-writing" },
+    credit: { label: "Who or what caused it", placeholder: "e.g. a new law, one leader" },
+    place: { label: "Where it started", placeholder: "e.g. the capital, the coast" },
+  },
+  peak: {
+    group: { label: "Who is being praised", placeholder: "e.g. the new leadership, a rising generation" },
+    trend: { label: "What they restored or brought", placeholder: "e.g. stability, open debate" },
+    value: { label: "What disorder they ended", placeholder: "e.g. corruption, constant infighting" },
+    credit: { label: "Who or what deserves credit", placeholder: "e.g. a new law, one leader" },
+    place: { label: "Where it started", placeholder: "e.g. the capital, the coast" },
+  },
+};
+
+function applyFieldText(mode) {
+  const set = FIELD_TEXT[mode] || FIELD_TEXT.decline;
+  Object.keys(set).forEach(key => {
+    const label = document.getElementById('label' + key.charAt(0).toUpperCase() + key.slice(1));
+    const input = document.getElementById(key);
+    if (label) label.textContent = set[key].label;
+    if (input) input.placeholder = set[key].placeholder;
+  });
+}
+
+function updateRandomOptionAvailability() {
+  const hasContent = ['group', 'trend', 'value', 'credit'].some(id => document.getElementById(id).value.trim());
+  const randomOption = document.querySelector('#mode option[value="random"]');
+  const modeSelect = document.getElementById('mode');
+  randomOption.disabled = hasContent;
+  if (hasContent && modeSelect.value === "random") {
+    // Force an explicit choice once the wording could be read either way.
+    modeSelect.value = "decline";
+    applyFieldText("decline");
+  }
+}
+
+['group', 'trend', 'value', 'credit'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateRandomOptionAvailability);
+});
+
+document.getElementById('mode').addEventListener('change', (e) => {
+  const val = e.target.value === "peak" ? "peak" : "decline";
+  applyFieldText(val);
+  // Typed content means something different under the new framing —
+  // clear it rather than risk praising what was typed as a complaint, or vice versa.
+  ['group', 'trend', 'value', 'credit'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  updateRandomOptionAvailability();
+});
+
+applyFieldText("decline");
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function fallback(val, list) { return val && val.trim() ? val.trim() : pick(list); }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function cap2(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function buildProclamation() {
+  const groupInput = document.getElementById('group').value;
+  const trendInput = document.getElementById('trend').value;
+  const valueInput = document.getElementById('value').value;
+  const creditInput = document.getElementById('credit').value;
+  const placeInput = document.getElementById('place').value;
+  const modeInput = document.getElementById('mode').value;
+
+  const era = pick(ERAS);
+  const isPeak = modeInput === "peak" ? true : modeInput === "decline" ? false : Math.random() < 0.5;
+
+  const group = fallback(groupInput, isPeak ? DEFAULT_GROUPS_PEAK : DEFAULT_GROUPS_DECLINE);
+  const trend = fallback(trendInput, isPeak ? DEFAULT_TRENDS_PEAK : DEFAULT_TRENDS_DECLINE);
+  const value = fallback(valueInput, isPeak ? DEFAULT_VALUES_PEAK : DEFAULT_VALUES_DECLINE);
+  const credit = fallback(creditInput, isPeak ? DEFAULT_CREDITS_PEAK : DEFAULT_CREDITS_DECLINE);
+  const place = placeInput && placeInput.trim() ? placeInput.trim() : null;
+
+  let preamble, complaintA, complaintB, pivot, closer, consequence, creditLine, blameLine, placeLine;
+
+  if (isPeak) {
+    preamble = pick(PREAMBLES_PEAK)(group);
+    complaintA = pick(COMPLAINTS_A_PEAK)(group, trend);
+    complaintB = pick(COMPLAINTS_B_PEAK)(group, value);
+    creditLine = pick(CREDIT_PEAK)(credit);
+    if (place) placeLine = pick(PLACE_PEAK)(place);
+    consequence = pick(CONSEQUENCES_PEAK);
+    pivot = pick(PIVOTS_PEAK)(consequence);
+    closer = pick(CLOSERS_PEAK)();
+  } else {
+    preamble = pick(PREAMBLES_DECLINE)(group);
+    complaintA = pick(COMPLAINTS_A_DECLINE)(group, trend);
+    complaintB = pick(COMPLAINTS_B_DECLINE)(group, value);
+    blameLine = pick(BLAME_DECLINE)(credit);
+    if (place) placeLine = pick(PLACE_DECLINE)(place);
+    consequence = pick(CONSEQUENCES_DECLINE);
+    pivot = pick(PIVOTS_DECLINE)(consequence);
+    closer = pick(CLOSERS_DECLINE)();
+  }
+
+  const causeLine = isPeak ? creditLine : blameLine;
+  const body = [preamble, complaintA, complaintB, causeLine];
+  if (placeLine) body.push(placeLine);
+  body.push(pivot, closer);
+  return { era, paragraphs: body, isPeak };
+}
+
+function seal(isPeak) {
+  return isPeak
+    ? `<svg viewBox="0 0 24 24"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.8 7.1 18.2 8 12.7 4 8.8l5.5-.8z"/></svg>`
+    : `<svg viewBox="0 0 24 24"><path d="M12 2v20M4 12h16M6 6l12 12M18 6L6 18" stroke-width="1.2"/></svg>`;
+}
+
+function render() {
+  const { paragraphs, isPeak } = buildProclamation();
+
+  const paraHtml = paragraphs.map(p => `<p class="proclamation">${p}</p>`).join('');
+
+  const html = `
+    <div class="document" id="proclamationDoc">
+      <div class="seal-mark">${seal(isPeak)}</div>
+      ${paraHtml}
+    </div>
+    <div class="actions">
+      <button class="again-btn" id="againBtn">Summon Another Voice</button>
+      <button class="again-btn" id="downloadBtn">Save as Image</button>
+    </div>
+  `;
+  document.getElementById('output').innerHTML = html;
+  document.getElementById('againBtn').addEventListener('click', render);
+  document.getElementById('downloadBtn').addEventListener('click', downloadAsImage);
+}
+
+function downloadAsImage() {
+  const target = document.getElementById('proclamationDoc');
+  const btn = document.getElementById('downloadBtn');
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Preparing image…';
+  btn.disabled = true;
+
+  html2canvas(target, {
+    scale: 2,
+    backgroundColor: '#DFD5BF',
+    useCORS: true,
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'proclamation.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }).catch(() => {
+    alert('Something went wrong creating the image. Please try again.');
+  }).finally(() => {
+    btn.textContent = originalLabel;
+    btn.disabled = false;
+  });
+}
+
+const REQUIRED_FIELDS = ['group', 'trend', 'value', 'credit', 'place'];
+
+function validateInputs() {
+  const empties = REQUIRED_FIELDS.filter(id => !document.getElementById(id).value.trim());
+  if (empties.length > 0) {
+    alert('Please fill in every field before issuing the proclamation.');
+    return false;
+  }
+  return true;
+}
+
+document.getElementById('generateBtn').addEventListener('click', () => {
+  if (!validateInputs()) return;
+  render();
+});
+</script>
+
+</body>
+</html>
